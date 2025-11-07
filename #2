@@ -1,0 +1,77 @@
+"""
+정수 N을 입력 받고, 크기가 NxN인 2차원 배열을 지도로 입력 받는다. 인근에 지뢰가 가장 많
+이 존재하는 위치에서 시작하여 인근에 지뢰가 가장 적게 존재하는 위치로 이동하려고 한다.
+인근에 지뢰가 가장 많이 존재하는 위치의 지뢰 개수와 인근에 지뢰가 가장 적게 존재하는 위
+치의 지뢰 개수를 출력하시오. 또한, 두 위치 사이를 최단 경로로 이동한다고 가정하였을 때,
+제거해야 하는 최소 지뢰 개수를 계산하시오. 단, 이동 중 방향 전환은 최대 1회만 할 수 있기
+때문에 ⎾, ⎿, ⏋, ⏌, | , — 중 한 형태로만 움직일 수 있다.
+- N은 3보다 크거나 같고 10보다 작다고 가정
+- 인근에 지뢰가 가장 많이 존재하는 위치와 가장 적게 존재하는 위치는 각 한 곳씩이라고 가정
+"""
+dx = (0, 1, 1, 1, 0, -1, -1, -1)
+dy = (1, 1, 0, -1, -1, -1, 0, 1)
+
+n = int(input())
+mp = [[0 for _ in range(n)] for _ in range(n)]
+
+for i in range(n):
+    s = input().rstrip()
+    for j in range(n):
+        if s[j] == '*':
+            mp[i][j] = '*'
+
+max_val = -1 
+min_val = 10
+maxx = maxy = minx = miny = -1
+
+for i in range(n):
+    for j in range(n):
+        if mp[i][j] != '*':
+            cnt = 0
+            for k in range(8):
+                nx = j + dx[k]
+                ny = i + dy[k]
+                if nx < 0 or nx >= n or ny < 0 or ny >= n:
+                    continue
+                if mp[ny][nx] == '*':
+                    cnt += 1
+            mp[i][j] = cnt
+
+            if cnt < min_val:
+                min_val = cnt
+                y1 = i
+                x1 = j
+            if cnt > max_val:
+                max_val = cnt
+                y2 = i
+                x2 = j
+
+mcnt = 0
+cnt1 = 0
+if x1 != x2:
+    step = 1 if x2 > x1 else -1
+    for x in range(x1 + step, x2, step):
+        if mp[y1][x] == '*': 
+            cnt1 += 1
+if y1 != y2:
+    step = 1 if y2 > y1 else -1
+    for y in range(y1, y2, step):
+        if mp[y][x2] == '*': 
+            cnt1 += 1
+
+
+cnt2 = 0
+if y1 != y2:
+    step = 1 if y2 > y1 else -1
+    for y in range(y1 + step, y2, step):
+        if mp[y][x1] == '*': 
+            cnt2 += 1
+if x1 != x2:
+    step = 1 if x2 > x1 else -1
+    for x in range(x1, x2, step):
+        if mp[y2][x] == '*': 
+            cnt2 += 1
+
+mcnt = min(cnt1, cnt2)
+
+print(str(max_val) + ' ' + str(min_val) + ' ' + str(mcnt))
